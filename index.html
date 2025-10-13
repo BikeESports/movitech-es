@@ -689,8 +689,7 @@ window.addEventListener('keydown', (e)=>{
   <button type="submit" id="submitContact">Enviar pedido</button>
   <button type="reset" id="resetContact">Limpiar</button>
 </form>
-
-
+    
     <div style="max-width:720px;margin:0 auto;padding:16px;border-radius:10px;border:1px solid #f6f6f6;background:#fff">
       <h3 style="margin:0 0 6px">Método de pago</h3>
       <p style="margin:0 0 6px;color:#333">Titular: <strong>Bridge Building</strong></p>
@@ -731,12 +730,49 @@ window.addEventListener('keydown', (e)=>{
       toast.style.transform = 'translateY(-400px)';
     }, 4000);
   }
+
+  // Envío del formulario con EmailJS
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    showToast('Enviando mensaje...', '#444');
+
+    const templateParams = {
+      name: form.name.value,
+      email: form.email.value,
+      phone: form.phone.value,
+      province: form.province.value,
+      city: form.city.value,
+      postal: form.postal.value,
+      country: form.country.value,
+      message: form.message.value
+    };
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+      .then(() => {
+        showToast('Mensaje enviado correctamente ✅', '#28a745');
+        form.reset();
+      })
+      .catch(() => {
+        showToast('Error al enviar el mensaje ❌', '#dc3545');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+      });
+  });
+
+  // Botón reset
+  resetBtn.addEventListener('click', () => {
+    form.reset();
+    showToast('Formulario limpiado', '#666');
+  });
 </script>
 
   <!-- ======== FIN formulario ======== -->
 
 </body>
 </html>
+
 
 
 
