@@ -723,36 +723,9 @@ window.addEventListener('keydown', (e)=>{
   }
 </script>
 
-
-  // Envío de formulario
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Enviando...';
-
-    const templateParams = {
-      name: form.name.value,
-      email: form.email.value,
-      subject: form.subject.value,
-      message: `Teléfono: ${form.phone.value || '-'}\n\n${form.message.value || ''}`
-    };
-
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-      .then(() => {
-        showToast('✅ Pedido enviado correctamente', '#1e9f43');
-        form.reset();
-      }, (error) => {
-        console.error('Error EmailJS:', error);
-        showToast('❌ Error enviando el pedido', '#e60000');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Enviar pedido';
-      });
-  });
-</script>
-<!-- ======== FIN formulario ======== -->
+  <!-- ======== FIN formulario ======== -->
 
 </body>
 </html>
+
 
