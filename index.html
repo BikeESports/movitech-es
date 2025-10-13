@@ -639,5 +639,120 @@ window.addEventListener('keydown', (e)=>{
   }
 });
 </script>
+  <!-- ======== FORMULARIO DE CONTACTO / PEDIDO + MÉTODO DE PAGO (EmailJS + Popup) ======== -->
+<section id="contacto-movitech" style="background:#fff;padding:40px 18px;border-top:1px solid #eee">
+  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px">
+    <div style="text-align:center">
+      <h2 style="margin:0 0 10px;font-size:1.8rem;color:#111">Contacto & Enviar pedido</h2>
+      <p style="color:#666;margin:0 0 8px">Completá el formulario y te responderemos a la mayor brevedad. Envíos gratis a toda España.</p>
+    </div>
+
+    <form id="movitechForm" style="max-width:720px;margin:0 auto;background:#fafafa;padding:18px;border-radius:10px;border:1px solid #f0f0f0">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <label style="display:block;font-weight:600;font-size:13px;color:#333">Nombre completo
+          <input name="name" required style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-top:6px" />
+        </label>
+
+        <label style="display:block;font-weight:600;font-size:13px;color:#333">Correo electrónico
+          <input name="email" type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-top:6px" />
+        </label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <label style="display:block;font-weight:600;font-size:13px;color:#333">Teléfono
+          <input name="phone" type="tel" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-top:6px" />
+        </label>
+
+        <label style="display:block;font-weight:600;font-size:13px;color:#333">Asunto
+          <input name="subject" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-top:6px" placeholder="Ej. Pedido / Consulta sobre X modelo" />
+        </label>
+      </div>
+
+      <label style="display:block;font-weight:600;font-size:13px;color:#333;margin-bottom:8px">Mensaje / Detalle del pedido</label>
+      <textarea name="message" rows="5" required style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-bottom:12px"></textarea>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end">
+        <button type="submit" id="submitContact" style="background:#e60000;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer">
+          Enviar pedido
+        </button>
+        <button type="button" id="resetContact" style="background:#000;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer">
+          Limpiar
+        </button>
+      </div>
+    </form>
+
+    <div style="max-width:720px;margin:0 auto;padding:16px;border-radius:10px;border:1px solid #f6f6f6;background:#fff">
+      <h3 style="margin:0 0 6px">Método de pago</h3>
+      <p style="margin:0 0 6px;color:#333">Titular: <strong>Bridge Building</strong></p>
+      <p style="margin:0 0 6px;color:#333">IBAN: <strong>IE06 MODR 9903 5507 0916 80</strong></p>
+      <p style="margin:0;color:#666;font-size:13px">Realizá la transferencia y envíanos el comprobante a la misma dirección de contacto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Popup visual (toast) -->
+<div id="toast" style="position:fixed;top:20px;right:-400px;background:#111;color:#fff;padding:14px 22px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,0.3);font-weight:600;transition:all 0.4s ease;z-index:9999"></div>
+
+<!-- Emails -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // Inicializar EmailJS
+  (function() {
+    emailjs.init("RjQA65odlqmPgYN6b");
+  })();
+
+  // Configuración
+  const SERVICE_ID = "service_9usf1qb";
+  const TEMPLATE_ID = "template_o3cha8b";
+  const PUBLIC_KEY = "RjQA65odlqmPgYN6b";
+
+  // Elementos del formulario
+  const form = document.getElementById('movitechForm');
+  const toast = document.getElementById('toast');
+  const submitBtn = document.getElementById('submitContact');
+  const resetBtn = document.getElementById('resetContact');
+
+  // Mostrar mensaje flotante
+  function showToast(message, color = '#111') {
+    toast.textContent = message;
+    toast.style.background = color;
+    toast.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      toast.style.transform = 'translateY(-400px)';
+    }, 4000);
+  }
+</script>
+
+
+  // Envío de formulario
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    const templateParams = {
+      name: form.name.value,
+      email: form.email.value,
+      subject: form.subject.value,
+      message: `Teléfono: ${form.phone.value || '-'}\n\n${form.message.value || ''}`
+    };
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+      .then(() => {
+        showToast('✅ Pedido enviado correctamente', '#1e9f43');
+        form.reset();
+      }, (error) => {
+        console.error('Error EmailJS:', error);
+        showToast('❌ Error enviando el pedido', '#e60000');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar pedido';
+      });
+  });
+</script>
+<!-- ======== FIN formulario ======== -->
+
 </body>
 </html>
+
