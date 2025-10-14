@@ -639,139 +639,133 @@ window.addEventListener('keydown', (e)=>{
   }
 });
 </script>
-  <!-- ======== FORMULARIO DE CONTACTO / PEDIDO + MÉTODO DE PAGO (EmailJS + Popup) ======== -->
-<section id="contacto-movitech" style="background:#fff;padding:40px 18px;border-top:1px solid #eee">
-  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:18px">
+<!-- ======== FORMULARIO DE PEDIDO ======== -->
+<section id="checkout-movitech" style="background:#fff;padding:40px 18px;border-top:1px solid #eee">
+  <div style="max-width:800px;margin:0 auto;display:grid;gap:24px">
+
     <div style="text-align:center">
-      <h2 style="margin:0 0 10px;font-size:1.8rem;color:#111">Contacto & Enviar pedido</h2>
-      <p style="color:#666;margin:0 0 8px">Completá el formulario y te responderemos a la mayor brevedad. Envíos gratis a toda España.</p>
+      <h2 style="margin:0 0 10px;font-size:1.8rem;color:#111">Finalizar compra</h2>
+      <p style="color:#666;margin:0 0 8px">Completá tus datos para confirmar tu pedido. Envíos gratis a toda España 🇪🇸</p>
     </div>
 
-<form id="movitechForm">
-  <div class="form-group">
-    <label for="name">Nombre completo</label>
-    <input type="text" id="name" name="name" required />
-  </div>
+    <!-- Formulario de datos -->
+    <form id="checkoutForm" style="display:grid;gap:14px">
 
-  <div class="form-group">
-    <label for="email">Correo electrónico</label>
-    <input type="email" id="email" name="email" required />
-  </div>
+      <!-- Estos se llenarán automáticamente al hacer clic en “Comprar” -->
+      <input type="hidden" id="productName" name="productName" value="">
+      <input type="hidden" id="productPrice" name="productPrice" value="">
 
-  <div class="form-group">
-    <label for="phone">Teléfono</label>
-    <input type="tel" id="phone" name="phone" required />
-  </div>
+      <div>
+        <label>Nombre completo</label>
+        <input type="text" id="name" name="name" required />
+      </div>
 
-  <div class="form-group">
-    <label for="province">Provincia</label>
-    <input type="text" id="province" name="province" required />
-  </div>
+      <div>
+        <label>Correo electrónico</label>
+        <input type="email" id="email" name="email" required />
+      </div>
 
-  <div class="form-group">
-    <label for="city">Ciudad</label>
-    <input type="text" id="city" name="city" required />
-  </div>
+      <div>
+        <label>Teléfono</label>
+        <input type="tel" id="phone" name="phone" required />
+      </div>
 
-  <div class="form-group">
-    <label for="postal">Código Postal</label>
-    <input type="text" id="postal" name="postal" required />
-  </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div><label>Provincia</label><input type="text" id="province" name="province" required></div>
+        <div><label>Ciudad</label><input type="text" id="city" name="city" required></div>
+        <div><label>Código postal</label><input type="text" id="postal" name="postal" required></div>
+      </div>
 
-  <div class="form-group">
-    <label for="message">Mensaje o consulta</label>
-    <textarea id="message" name="message" rows="5" required></textarea>
-  </div>
+      <input type="hidden" id="country" name="country" value="España">
 
-  <!-- Campo oculto con país fijo -->
-  <input type="hidden" id="country" name="country" value="España" />
+      <div>
+        <label>Mensaje o aclaraciones</label>
+        <textarea id="message" name="message" rows="4"></textarea>
+      </div>
 
-  <button type="submit" id="submitContact">Enviar pedido</button>
-  <button type="reset" id="resetContact">Limpiar</button>
-</form>
-    
-    <div style="max-width:720px;margin:0 auto;padding:16px;border-radius:10px;border:1px solid #f6f6f6;background:#fff">
-      <h3 style="margin:0 0 6px">Método de pago</h3>
-      <p style="margin:0 0 6px;color:#333">Titular: <strong>Bridge Building</strong></p>
-      <p style="margin:0 0 6px;color:#333">IBAN: <strong>IE06 MODR 9903 5507 0916 80</strong></p>
-      <p style="margin:0;color:#666;font-size:13px">Realizá la transferencia y envíanos el comprobante a la misma dirección de contacto.</p>
+      <button type="submit" id="submitCheckout">Confirmar pedido</button>
+    </form>
+
+    <!-- IBAN e instrucciones -->
+    <div id="paymentInfo" style="display:none;text-align:center;padding:20px;border-radius:10px;background:#fafafa;border:1px solid #eee">
+      <h3>Método de pago</h3>
+      <p>Titular: <strong>Bridge Building</strong></p>
+      <p>IBAN: <strong>IE06 MODR 9903 5507 0916 80</strong></p>
+      <p>Realizá la transferencia y enviá el comprobante al correo:  
+        <strong>movitech.es@gmail.com</strong>
+      </p>
+      <p style="color:#555;font-size:14px">
+        Recordá adjuntar el comprobante y en el asunto escribir tu nombre completo.
+      </p>
     </div>
+
   </div>
 </section>
 
-<!-- Popup visual (toast) -->
-<div id="toast" style="position:fixed;top:20px;right:-400px;background:#111;color:#fff;padding:14px 22px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,0.3);font-weight:600;transition:all 0.4s ease;z-index:9999"></div>
+<!-- Popup visual -->
+<div id="toast" style="position:fixed;top:20px;right:-400px;background:#111;color:#fff;padding:14px 22px;border-radius:10px;transition:all .4s ease;z-index:9999"></div>
 
-<!-- Emails -->
+<!-- ======== EMAILJS ======== -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  // Inicializar EmailJS
-  (function() {
-    emailjs.init("RjQA65odlqmPgYN6b");
-  })();
+(function() {
+  emailjs.init("RjQA65odlqmPgYN6b");
+})();
 
-  // Configuración
-  const SERVICE_ID = "service_9usf1qb";
-  const TEMPLATE_ID = "template_o3cha8b";
-  const PUBLIC_KEY = "RjQA65odlqmPgYN6b";
+const SERVICE_ID = "service_9usf1qb";
+const TEMPLATE_ID = "template_o3cha8b";
+const PUBLIC_KEY = "RjQA65odlqmPgYN6b";
 
-  // Elementos del formulario
-  const form = document.getElementById('movitechForm');
-  const toast = document.getElementById('toast');
-  const submitBtn = document.getElementById('submitContact');
-  const resetBtn = document.getElementById('resetContact');
+const checkoutForm = document.getElementById("checkoutForm");
+const paymentInfo = document.getElementById("paymentInfo");
+const toast = document.getElementById("toast");
+const submitBtn = document.getElementById("submitCheckout");
 
-  // Mostrar mensaje flotante
-  function showToast(message, color = '#111') {
-    toast.textContent = message;
-    toast.style.background = color;
-    toast.style.transform = 'translateY(0)';
-    setTimeout(() => {
-      toast.style.transform = 'translateY(-400px)';
-    }, 4000);
-  }
+function showToast(msg, color="#111") {
+  toast.textContent = msg;
+  toast.style.background = color;
+  toast.style.right = "20px";
+  setTimeout(()=>{toast.style.right = "-400px"},4000);
+}
 
-  // Envío del formulario con EmailJS
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    showToast('Enviando mensaje...', '#444');
+// Paso 1: confirmar pedido
+checkoutForm.addEventListener("submit", e => {
+  e.preventDefault();
+  submitBtn.disabled = true;
+  showToast("Enviando pedido...", "#444");
 
-    const templateParams = {
-      name: form.name.value,
-      email: form.email.value,
-      phone: form.phone.value,
-      province: form.province.value,
-      city: form.city.value,
-      postal: form.postal.value,
-      country: form.country.value,
-      message: form.message.value
-    };
+  const templateParams = {
+    name: checkoutForm.name.value,
+    email: checkoutForm.email.value,
+    phone: checkoutForm.phone.value,
+    province: checkoutForm.province.value,
+    city: checkoutForm.city.value,
+    postal: checkoutForm.postal.value,
+    country: checkoutForm.country.value,
+    message: checkoutForm.message.value,
+    product: checkoutForm.productName.value || "(Producto no especificado)",
+    price: checkoutForm.productPrice.value || "(Sin precio)"
+  };
 
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
-      .then(() => {
-        showToast('Mensaje enviado correctamente ✅', '#28a745');
-        form.reset();
-      })
-      .catch(() => {
-        showToast('Error al enviar el mensaje ❌', '#dc3545');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-      });
-  });
-
-  // Botón reset
-  resetBtn.addEventListener('click', () => {
-    form.reset();
-    showToast('Formulario limpiado', '#666');
-  });
+  emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+    .then(() => {
+      showToast("✅ Pedido enviado correctamente", "#16a34a");
+      checkoutForm.style.display = "none";
+      paymentInfo.style.display = "block";
+      submitBtn.disabled = false;
+    })
+    .catch(() => {
+      showToast("❌ Error al enviar pedido", "#dc2626");
+      submitBtn.disabled = false;
+    });
+});
 </script>
 
   <!-- ======== FIN formulario ======== -->
 
 </body>
 </html>
+
 
 
 
