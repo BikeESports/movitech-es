@@ -1,772 +1,281 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MovitechES — Tienda de móviles (España)</title>
-  <meta name="description" content="MovitechES — Tienda online de móviles, cargadores y accesorios. Envío gratis a España. Precios en €." />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MovitechES</title>
   <style>
-    :root{
-      --bg:#ffffff;
-      --text:#111;
-      --muted:#666;
-      --buy:#e60000; /* rojo para Comprar ahora */
-      --cart:#000000; /* negro para Agregar al carrito */
-      --card-border:#e9e9e9;
-      --max-width:1200px;
+    body {
       font-family: 'Poppins', sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      color: #111;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-    a{color:inherit;text-decoration:none}
 
-    /* Header */
-    header{position:sticky;top:0;background:var(--bg);z-index:1200;border-bottom:1px solid #f2f2f2}
-    .header-inner{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;gap:16px;padding:14px}
-    .logo{width:170px;display:flex;align-items:center;gap:10px}
-    .logo img{width:140px;height:auto;object-fit:contain}
-    .search{flex:1;display:flex;align-items:center}
-    .search input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px}
-    .header-actions{display:flex;gap:12px;align-items:center}
-    .cat-nav{max-width:var(--max-width);margin:12px auto 0;padding:0 16px;display:flex;gap:12px;overflow:auto}
-    .cat-nav button{background:transparent;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:600;color:var(--muted)}
-    .cat-nav button.active{background:#f5f8ff;color:var(--buy);border:1px solid #fdecea}
-
-    /* Layout */
-    .container{max-width:var(--max-width);margin:18px auto;display:grid;grid-template-columns:260px 1fr;gap:18px;padding:0 16px}
-    @media (max-width:980px){ .container{grid-template-columns:1fr; padding:0 12px} .left-col{order:2} .right-col{order:1} }
-
-    /* Left filters */
-    .left-card{background:var(--bg);border:1px solid var(--card-border);border-radius:10px;padding:12px;position:sticky;top:86px}
-    .left-card h4{margin:0 0 8px;font-size:14px}
-    .brand-list{display:flex;flex-direction:column;gap:8px}
-    .brand-list label{font-size:14px;cursor:pointer;color:var(--muted)}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#f3f6fb;color:var(--buy);font-weight:700;font-size:13px}
-
-    /* Catalog grid */
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
-    .card{background:var(--bg);border:1px solid var(--card-border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .18s ease, box-shadow .18s ease}
-    .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(15,20,30,.06)}
-    .thumb-wrap{position:relative;padding:12px;background:#fbfcfd;display:flex;align-items:center;justify-content:center}
-    .thumb{width:100%;height:220px;object-fit:contain;background:#fff;border-radius:6px}
-    .label-free{position:absolute;left:12px;top:12px;background:#eef9f3;color:#1a9a1a;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
-    .meta{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
-    .title{font-weight:700;font-size:15px;color:var(--text)}
-    .brand{color:var(--muted);font-size:13px}
-    .price{font-weight:800;color:var(--buy);font-size:18px}
-    .monthly{color:var(--muted);font-size:13px}
-    .actions{display:flex;gap:8px;margin-top:auto}
-    .btn{flex:1;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:14px}
-    .btn-buy{background:var(--buy);color:#fff}
-    .btn-cart{background:var(--cart);color:#fff}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* footer */
-    footer{max-width:var(--max-width);margin:28px auto 40px;padding:0 16px;color:var(--muted);text-align:center;font-size:14px}
-
-    /* Gallery modal */
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:3000;padding:18px}
-    .modal.show{display:flex}
-    .modal-card{width:880px;max-width:96%;background:#fff;border-radius:10px;padding:16px;border:1px solid #ececec;box-shadow:0 18px 40px rgba(0,0,0,0.08)}
-    .modal-img{width:100%;height:60vh;object-fit:contain;border-radius:8px;background:#fff}
-    .thumbs{display:flex;gap:8px;margin-top:10px;overflow:auto}
-    .thumbs img{width:84px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;opacity:.9;border:2px solid transparent}
-    .thumbs img.active{border-color:var(--buy);opacity:1}
-
-    .close-x{background:transparent;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
-
-    /* Cart drawer */
-    .cart-drawer{position:fixed;right:18px;top:70px;width:360px;max-width:94vw;height:calc(100vh - 96px);background:#fff;border-radius:12px;box-shadow:0 30px 80px rgba(10,20,40,.16);padding:12px;transform:translateX(120%);transition:transform .28s ease;z-index:4000;display:flex;flex-direction:column}
-    .cart-drawer.open{transform:translateX(0)}
-    .cart-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid #f1f4f8}
-    .cart-items{overflow:auto;padding:8px 0;flex:1}
-    .cart-item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f5f7fa}
-    .cart-item img{width:68px;height:54px;object-fit:cover;border-radius:6px}
-    .cart-footer{padding-top:10px;border-top:1px solid #f1f4f8}
-    .qty{display:flex;gap:8px;align-items:center}
-    .small-muted{font-size:13px;color:var(--muted)}
-
-    /* Proximamente card */
-    .coming{padding:22px;border-radius:12px;border:1px dashed #ececec;text-align:center;background:linear-gradient(180deg,#fff,#fbfbff);box-shadow:0 6px 18px rgba(12,20,40,.03)}
-    .coming h3{margin:0 0 6px}
-    .sparkle{display:inline-block;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,#fff2f2,#fff);color:var(--buy);font-weight:800}
-
-    @media (max-width:720px){
-      .thumb{height:160px}
-      .card .thumb{height:160px}
-      .modal-card{padding:12px}
-      .header-inner{flex-wrap:wrap}
+    header {
+      background: #fff;
+      padding: 18px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
+    header h1 {
+      font-size: 1.6rem;
+      margin: 0;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 22px;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .product:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    .product img {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .product h3 {
+      font-size: 1.1rem;
+      margin: 12px 0 6px;
+    }
+
+    .product .price {
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    .product button {
+      background: #111;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .product button:hover {
+      background: #333;
+    }
+
+    /* ===== POPUP ===== */
+    #checkoutPopup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #popupContent {
+      background: #fff;
+      padding: 30px 28px;
+      border-radius: 18px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transform: scale(0.8);
+      opacity: 0;
+      transition: all .4s ease;
+    }
+
+    #popupContent.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    #popupContent form input,
+    #popupContent form textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    #popupContent button {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    #closePopup {
+      margin-top: 14px;
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      display: block;
+      margin-inline: auto;
+    }
+
   </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">
-      <!-- Logo en la raíz del repo -->
-      <img src="logo-movitech-es.png" alt="MovitechES logo" id="siteLogo" onerror="this.style.display='none'; this.parentNode.textContent='MovitechES'">
+  <!-- ===== ENCABEZADO ===== -->
+  <header>
+    <h1>MovitechES</h1>
+    <nav>
+      <a href="#productos" style="color:#111;text-decoration:none;font-weight:500;">Productos</a>
+    </nav>
+  </header>
+
+  <!-- ===== PRODUCTOS ===== -->
+  <section id="productos" class="product-grid">
+    <div class="product">
+      <img src="https://via.placeholder.com/250x200.png?text=Producto+1" alt="Producto 1">
+      <h3>Teclado Mecánico RGB</h3>
+      <p class="price">€59.99</p>
+      <button data-product="Teclado Mecánico RGB" data-price="€59.99">Comprar</button>
     </div>
 
-    <div class="search">
-      <input id="searchInput" placeholder="Buscar móviles, marcas o modelos (ej. iPhone, Samsung)" />
+    <div class="product">
+      <img src="https://via.placeholder.com/250x200.png?text=Producto+2" alt="Producto 2">
+      <h3>Mouse Gamer Inalámbrico</h3>
+      <p class="price">€34.99</p>
+      <button data-product="Mouse Gamer Inalámbrico" data-price="€34.99">Comprar</button>
     </div>
 
-    <div class="header-actions">
-      <div class="badge">Precios en € • Envío gratis</div>
-      <button id="openCartBtn" title="Carrito" style="background:transparent;border:1px solid #f0f0f0;padding:8px 10px;border-radius:8px;cursor:pointer">
-        🛒 <span id="cartCount">0</span>
-      </button>
-    </div>
-  </div>
-
-  <nav class="cat-nav" aria-label="Categorías">
-    <button data-cat="all" class="active">Todos</button>
-    <button data-cat="móviles">Móviles</button>
-    <button data-cat="cargadores">Cargadores</button>
-    <button data-cat="smartwatchs">Smartwatchs</button>
-    <button data-cat="auriculares">Auriculares</button>
-  </nav>
-</header>
-
-<main class="container">
-  <!-- Left: filtros -->
-  <aside class="left-col">
-    <div class="left-card">
-      <h4>Filtrar</h4>
-      <div style="margin-bottom:12px">
-        <label class="small">Marca</label>
-        <div class="brand-list" id="brandList">
-          <!-- marcas generadas por JS -->
-        </div>
-      </div>
-
-      <div style="margin-top:8px">
-        <label class="small">Precio</label>
-        <select id="priceFilter" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6ef">
-          <option value="">Todos los precios</option>
-          <option value="0-150">0 — 150 €</option>
-          <option value="150-300">150 — 300 €</option>
-          <option value="300-600">300 — 600 €</option>
-          <option value="600-1000">600 — 1.000 €</option>
-          <option value="1000-">+1000 €</option>
-        </select>
-      </div>
-
-      <div style="margin-top:14px">
-        <label class="small">Orden</label>
-        <select id="sortBy" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6ef">
-          <option value="default">Recomendados</option>
-          <option value="price-asc">Precio: más bajo</option>
-          <option value="price-desc">Precio: más alto</option>
-          <option value="name-asc">Nombre A → Z</option>
-        </select>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Right: catálogo -->
-  <section class="right-col">
-    <!-- Móviles -->
-    <h2 style="margin:0 0 12px">Móviles</h2>
-    <div id="mobilesSection" class="grid" aria-live="polite"></div>
-
-    <!-- Cargadores -->
-    <h2 style="margin:20px 0 12px">Cargadores</h2>
-    <div id="chargersSection" class="grid"></div>
-
-    <!-- Smartwatchs - próximamente -->
-    <h2 style="margin:20px 0 12px">Smartwatchs</h2>
-    <div class="coming" style="margin-bottom:18px">
-      <h3>¡Muy pronto en MovitechES!</h3>
-      <div class="small">Relojes inteligentes — disponibles pronto. Mantente atento.</div>
-    </div>
-
-    <!-- Auriculares - próximamente -->
-    <h2 style="margin:20px 0 12px">Auriculares</h2>
-    <div class="coming">
-      <h3>¡Muy pronto en MovitechES!</h3>
-      <div class="small">Auriculares inalámbricos con cancelación de ruido — en breve.</div>
+    <div class="product">
+      <img src="https://via.placeholder.com/250x200.png?text=Producto+3" alt="Producto 3">
+      <h3>Monitor Full HD 24"</h3>
+      <p class="price">€129.99</p>
+      <button data-product='Monitor Full HD 24"' data-price="€129.99">Comprar</button>
     </div>
   </section>
-</main>
 
-<footer>© <span id="yearFooter"></span> MovitechES — Todos los derechos reservados.</footer>
+  <!-- ===== POPUP DE COMPRA ===== -->
+  <div id="checkoutPopup">
+    <div id="popupContent">
+      <h2 style="text-align:center;margin-bottom:12px;font-size:1.6rem;color:#111;">Finalizar pedido</h2>
+      <p id="selectedProduct" style="text-align:center;margin-bottom:20px;color:#444;font-size:15px;"></p>
 
-<!-- Gallery Modal -->
-<div id="galleryModal" class="modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <strong id="galleryTitle">Galería</strong>
-      <button class="close-x" id="closeGallery">✕</button>
-    </div>
-    <img id="galleryImage" class="modal-img" src="" alt="Imagen del producto">
-    <div class="thumbs" id="galleryThumbs"></div>
-  </div>
-</div>
+      <form id="popupForm">
+        <div style="display:grid;gap:10px;">
+          <input type="text" name="name" placeholder="Nombre completo" required>
+          <input type="email" name="email" placeholder="Correo electrónico" required>
+          <input type="tel" name="phone" placeholder="Teléfono" required>
+          <input type="text" name="province" placeholder="Provincia" required>
+          <input type="text" name="city" placeholder="Ciudad" required>
+          <input type="text" name="postal" placeholder="Código Postal" required>
+          <input type="hidden" name="country" value="España">
+          <textarea name="message" placeholder="Mensaje o detalles del pedido" rows="3" required></textarea>
 
-<!-- Cart Drawer -->
-<aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
-  <div class="cart-header">
-    <div style="font-weight:800">Tu carrito</div>
-    <button class="close-x" id="closeCartDrawer">✕</button>
-  </div>
-  <div class="cart-items" id="cartItems">
-    <div class="small-muted">Tu carrito está vacío</div>
-  </div>
-  <div class="cart-footer">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-      <div class="small-muted">Subtotal</div>
-      <div style="font-weight:800" id="cartSubtotal">0 €</div>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:10px">
-      <button id="checkoutBtn" class="btn btn-buy" style="flex:1">Finalizar compra</button>
-      <button id="clearCartBtn" class="btn" style="flex:1;border:1px solid #eee;background:#fafafa">Vaciar</button>
-    </div>
-    <div style="margin-top:10px;font-size:13px;color:var(--muted)">Integración de pago no incluida. Este es un prototipo de front-end.</div>
-  </div>
-</aside>
+          <div style="margin-top:10px;border:1px solid #eee;border-radius:10px;padding:12px;background:#fafafa;">
+            <h4 style="margin:0 0 6px;font-size:15px;color:#111;">Datos para el pago</h4>
+            <p style="margin:0;font-size:14px;">Titular: <strong>Bridge Building</strong></p>
+            <p style="margin:0;font-size:14px;">IBAN: <strong>IE06 MODR 9903 5507 0916 80</strong></p>
+          </div>
 
-<script>
-/* =======================
-   Datos de productos (sin mostrar URLs en texto visible)
-   Las imágenes se cargan a través de JS para que no aparezcan impresas como enlaces visibles.
-   Nota: las rutas de imagen siguen siendo necesarias para cargar las imágenes; no se muestran
-   como texto en la UI.
-   ======================= */
-const PRODUCTS = [
-  { id: 'poco-x7', category:'móviles', brand:'Xiaomi', title:'Xiaomi POCO X7 Pro 5G — 256GB / 8GB', price:380, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S51ed01ad95ba4403ac7c8630a0e9c36f0.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/S802e3a3b66b644bba4cacb13aacec2400.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
+          <label style="margin-top:10px;font-size:14px;color:#333;">Adjuntar comprobante de pago:</label>
+          <input type="file" name="receipt" accept="image/*,.pdf" required>
 
-  { id: 'redmi-14-proplus', category:'móviles', brand:'Xiaomi', title:'Xiaomi Redmi Note 14 Pro Plus 5G — 256GB / 8GB', price:400, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/E8c5a2780e539459f85608fe732361ab2J.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E8ae281165f38412e9f66f67dd69010b4U.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/Ea8b6a461d9494219bcde3c448ea6ef9eO.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E1d7715d65b6346d6a969f6db32627550I.png_220x220.png_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'redmi-14', category:'móviles', brand:'Xiaomi', title:'Xiaomi Redmi Note 14 — 256GB / 8GB', price:260, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/Ebd27b1ae56b84fd0afa64cd4be4959e1i.jpg_220x220q75.jpg_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E82c85dc548574d768f95ef65360753e9W.jpg_220x220q75.jpg_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E56c215aa001d4512b465c2c4c00bf92fZ.jpg_220x220q75.jpg_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E21cd69747a2e45619b9ca5f663807780c.jpg_220x220q75.jpg_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E8c4136c46c904c848d445ab219921126I.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'galaxy-a16', category:'móviles', brand:'Samsung', title:'Samsung Galaxy A16 4G — 128GB / 8GB', price:260, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/A5d55fb0d809a4e60bf247d99f5d1278bI.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/Ec2cb8d5f86aa464abd4099db9f7f926fM.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/Eca38dfd7bd1843f89b24249ea3d95e71e.png_220x220.png_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'galaxy-a55', category:'móviles', brand:'Samsung', title:'Samsung Galaxy A55 5G — 128GB / 8GB', price:585, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/A2639587b3a9b49d191673527fd5a3e01e.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/Aa7a117c95dce4062bc18491d54f1d507h.png_220x220.png_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'galaxy-s25', category:'móviles', brand:'Samsung', title:'Samsung Galaxy S25 — 256GB / 12GB', price:1150, images:[
-    'https://http2.mlstatic.com/D_NQ_NP_2X_837854-MLA93499120927_092025-F.webp',
-    'https://ae-pic-a1.aliexpress-media.com/kf/S60cf8faa4b8e4d98819d8de38965c0ef9.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'galaxy-a56', category:'móviles', brand:'Samsung', title:'Samsung Galaxy A56 5G — 128GB / 8GB', price:390, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/Ec35f0b27537140688696c969cddeb123U.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'motorola-razr50', category:'móviles', brand:'Motorola', title:'Motorola Moto Razr 50 Ultra 5G — 512GB / 12GB', price:850, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S0e9d3681551a406fa3242af6fa7fa6a1g.png_220x220.png_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'iphone-15-pro', category:'móviles', brand:'Apple', title:'iPhone 15 Pro — 256GB / 8GB', price:1100, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S40f93b47d7aa420a89cd9c9433dd2a00j.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'iphone-16-pro-max', category:'móviles', brand:'Apple', title:'iPhone 16 Pro Max — 256GB / 8GB', price:1700, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/Ec810889b26b0435987e018e3c3d829e6c.jpg_.webp',
-    'https://ae-pic-a1.aliexpress-media.com/kf/E4b6363bf0ee1492fb5f8014beb7f0eeb8.jpg_.webp'
-  ], colors:[ {name:'Titanio Negro', img:0}, {name:'Titanio Natural', img:1} ], shipping:'Envío gratis' },
-
-  { id: 'iphone-14-refurb', category:'móviles', brand:'Apple', title:'iPhone 14 — Reacondicionado 256GB / 8GB', price:680, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/Sf9648566a5b149c08c00a9e946108362B.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis', tags:['Reacondicionado'] },
-
-  { id: 'iphone-14-pro', category:'móviles', brand:'Apple', title:'iPhone 14 Pro — 256GB / 6GB', price:900, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S3126c0a24d2e4acb89a8bce298f907e2E.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  /* Cargadores */
-  { id: 'poco-x7-charger', category:'cargadores', brand:'Xiaomi', title:'Xiaomi Poco X7 Pro — Cargador 90W Turbo + Cable 2M', price:20, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S22e8714805d446348603d58ad837c792R.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'pd-20w', category:'cargadores', brand:'Universal', title:'Cargador PD USB-C 20W — Compatible iPhone', price:15, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S53cdbe00471d4335977c6b6065e4f6edB.jpg_220x220q75.jpg_.avif'
-  ], shipping:'Envío gratis' },
-
-  { id: 'samsung-45w', category:'cargadores', brand:'Samsung', title:'Samsung 45W — Cargador Superrápido (Certificado UE)', price:15, images:[
-    'https://ae-pic-a1.aliexpress-media.com/kf/S234cd80be2d847c0a328b6d0fb8b3cf97.png_220x220.png_.avif',
-    'https://ae-pic-a1.aliexpress-media.com/kf/S561eeddaa31a46eea9b9b5a8947f08c4M.png_220x220.png_.avif'
-  ], colors:[ {name:'Negro', img:0}, {name:'Blanco', img:1} ], shipping:'Envío gratis' }
-];
-
-/* =======================
-   Helpers y render
-   ======================= */
-function fmtEUR(n){ return new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'}).format(n); }
-const mobilesEl = document.getElementById('mobilesSection');
-const chargersEl = document.getElementById('chargersSection');
-const brandListEl = document.getElementById('brandList');
-const searchInput = document.getElementById('searchInput');
-const priceFilter = document.getElementById('priceFilter');
-const sortBy = document.getElementById('sortBy');
-const catButtons = document.querySelectorAll('.cat-nav button');
-let activeCategory = 'all';
-let activeBrandFilters = new Set();
-
-/* Build unique brands */
-const brands = Array.from(new Set(PRODUCTS.map(p=>p.brand))).sort();
-brands.forEach(b=>{
-  const id = 'brand-'+b.replace(/\s+/g,'-').toLowerCase();
-  const wrap = document.createElement('label');
-  wrap.innerHTML = `<input type="checkbox" data-brand="${b}" id="${id}" style="margin-right:8px"> ${b}`;
-  brandListEl.appendChild(wrap);
-});
-
-/* Event brand checkboxes */
-brandListEl.addEventListener('change', (e)=>{
-  if(e.target && e.target.dataset && e.target.dataset.brand){
-    const b = e.target.dataset.brand;
-    if(e.target.checked) activeBrandFilters.add(b); else activeBrandFilters.delete(b);
-    applyFilters();
-  }
-});
-
-/* Category nav */
-catButtons.forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    catButtons.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeCategory = btn.dataset.cat;
-    applyFilters();
-  });
-});
-
-/* Render product card */
-function makeCard(p){
-  const wrap = document.createElement('article');
-  wrap.className = 'card';
-  // main image placeholder (we will set real src via JS below so urls are not printed in HTML as text)
-  const imgPlaceholder = '';
-  wrap.innerHTML = `
-    <div class="thumb-wrap">
-      <img class="thumb" data-id="${p.id}" alt="${escapeHtml(p.title)}" />
-      <div class="label-free">🚚 ${p.shipping}</div>
-    </div>
-    <div class="meta">
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-        <div>
-          <div class="title">${escapeHtml(p.title)}</div>
-          <div class="brand">${escapeHtml(p.brand)} ${p.tags ? ' • ' + p.tags.join(', ') : ''}</div>
+          <button type="submit" style="background:#111;color:#fff;border:none;padding:12px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">
+            Enviar pedido y comprobante
+          </button>
         </div>
-        <div style="text-align:right">
-          <div class="price">${fmtEUR(p.price)}</div>
-          <div class="monthly small-muted">${p.colors ? 'Variantes disponibles' : ''}</div>
-        </div>
-      </div>
-      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-buy" data-action="buy" data-id="${p.id}">Comprar ahora</button>
-        <button class="btn btn-cart" data-action="add" data-id="${p.id}">Agregar al carrito</button>
-      </div>
+      </form>
+
+      <button id="closePopup">Cancelar</button>
     </div>
-  `;
-  // attach encoded image data as dataset (we will fill src later)
-  wrap.dataset.imgs = JSON.stringify(p.images || []);
-  if(p.colors) wrap.dataset.colors = JSON.stringify(p.colors);
-  return wrap;
-}
+  </div>
 
-/* Escape */
-function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  <!-- ===== EMAILJS SCRIPT ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("RjQA65odlqmPgYN6b");
+    })();
 
-/* Render sections */
-function renderSections(list){
-  mobilesEl.innerHTML = '';
-  chargersEl.innerHTML = '';
-  list.forEach(p=>{
-    const card = makeCard(p);
-    if(p.category === 'móviles') mobilesEl.appendChild(card);
-    if(p.category === 'cargadores') chargersEl.appendChild(card);
-  });
-  attachCardEvents();
-  // After cards created, populate images (so URLs are not visible as text nodes)
-  populateImages();
-}
+    const SERVICE_ID = "service_9usf1qb";
+    const TEMPLATE_ID = "template_o3cha8b";
 
-/* Populate images after DOM creation (keeps image urls out of visible text) */
-function populateImages(){
-  document.querySelectorAll('.card').forEach(card=>{
-    try{
-      const imgs = JSON.parse(card.dataset.imgs || '[]');
-      const imgEl = card.querySelector('img.thumb');
-      if(imgs.length){
-        // set the first image as src
-        imgEl.src = imgs[0];
-        // keep additional images available in dataset for gallery (not printed)
-        card.dataset.gallery = JSON.stringify(imgs);
-      } else {
-        imgEl.src = '';
+    const popup = document.getElementById('checkoutPopup');
+    const popupContent = document.getElementById('popupContent');
+    const popupForm = document.getElementById('popupForm');
+    const closePopup = document.getElementById('closePopup');
+    const selectedProduct = document.getElementById('selectedProduct');
+
+    // Abrir popup al hacer clic en "Comprar"
+    document.querySelectorAll('button, a').forEach(btn => {
+      if (btn.textContent.toLowerCase().includes('comprar')) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const productName = btn.getAttribute('data-product') || btn.closest('.product')?.querySelector('h3')?.innerText || 'Producto sin nombre';
+          const productPrice = btn.getAttribute('data-price') || btn.closest('.product')?.querySelector('.price')?.innerText || '';
+          selectedProduct.innerHTML = `<strong>${productName}</strong> ${productPrice ? '- ' + productPrice : ''}`;
+          popup.style.display = 'flex';
+          setTimeout(() => popupContent.classList.add('show'), 50);
+        });
       }
-    }catch(e){
-      // ignore
-    }
-  });
-}
-
-/* Apply filters/search/sort */
-function applyFilters(){
-  let list = PRODUCTS.slice();
-
-  // category filter
-  if(activeCategory && activeCategory !== 'all'){
-    list = list.filter(p => {
-      if(activeCategory === 'smartwatchs' || activeCategory === 'auriculares') return false;
-      return p.category === activeCategory;
     });
-  }
 
-  // brand filter
-  if(activeBrandFilters.size){
-    list = list.filter(p => activeBrandFilters.has(p.brand));
-  }
-
-  // search
-  const q = searchInput.value.trim().toLowerCase();
-  if(q){
-    list = list.filter(p => (p.title + ' ' + p.brand).toLowerCase().includes(q));
-  }
-
-  // price
-  const pf = priceFilter.value;
-  if(pf){
-    const [min,max] = pf.split('-');
-    list = list.filter(p=>{
-      if(min && p.price < Number(min)) return false;
-      if(max && max !== '' && p.price > Number(max)) return false;
-      return true;
+    // Cerrar popup
+    closePopup.addEventListener('click', () => {
+      popupContent.classList.remove('show');
+      setTimeout(() => popup.style.display = 'none', 300);
     });
-  }
 
-  // sort
-  const s = sortBy.value;
-  if(s === 'price-asc') list.sort((a,b)=>a.price-b.price);
-  if(s === 'price-desc') list.sort((a,b)=>b.price-a.price);
-  if(s === 'name-asc') list.sort((a,b)=>a.title.localeCompare(b.title));
+    // Enviar formulario con comprobante
+    popupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(popupForm);
+      const file = formData.get("receipt");
+      const reader = new FileReader();
 
-  renderSections(list);
-}
+      reader.onload = async function() {
+        const base64File = reader.result.split(',')[1];
+        const templateParams = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          province: formData.get("province"),
+          city: formData.get("city"),
+          postal: formData.get("postal"),
+          country: formData.get("country"),
+          message: formData.get("message"),
+          product: selectedProduct.textContent,
+          receipt_base64: base64File
+        };
 
-/* Initial render */
-applyFilters();
-
-/* Attach events to card buttons and images */
-function attachCardEvents(){
-  document.querySelectorAll('.card').forEach(card=>{
-    const imgs = card.dataset.gallery ? JSON.parse(card.dataset.gallery) : [];
-    const thumb = card.querySelector('.thumb');
-    // open gallery on click
-    thumb.addEventListener('click', ()=> {
-      const productTitle = card.querySelector('.title').textContent;
-      openGallery(productTitle, imgs);
+        try {
+          await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
+          alert("✅ Pedido enviado correctamente. Te contactaremos pronto.");
+          popupForm.reset();
+          closePopup.click();
+        } catch (error) {
+          console.error(error);
+          alert("❌ Error al enviar el pedido. Intenta nuevamente.");
+        }
+      };
+      reader.readAsDataURL(file);
     });
-  });
-
-  document.querySelectorAll('button[data-action="add"]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const id = e.currentTarget.dataset.id;
-      addToCart(id);
-    });
-  });
-  document.querySelectorAll('button[data-action="buy"]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const id = e.currentTarget.dataset.id;
-      buyNow(id);
-    });
-  });
-}
-
-/* Gallery logic */
-const galleryModal = document.getElementById('galleryModal');
-const galleryImage = document.getElementById('galleryImage');
-const galleryThumbs = document.getElementById('galleryThumbs');
-const galleryTitle = document.getElementById('galleryTitle');
-const closeGallery = document.getElementById('closeGallery');
-let currentGallery = [], currentGalleryIndex = 0;
-
-function openGallery(title, images){
-  currentGallery = images || [];
-  currentGalleryIndex = 0;
-  galleryImage.src = currentGallery[0] || '';
-  galleryTitle.textContent = title;
-  buildGalleryThumbs();
-  galleryModal.classList.add('show');
-  galleryModal.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-}
-function buildGalleryThumbs(){
-  galleryThumbs.innerHTML = '';
-  currentGallery.forEach((src,i)=>{
-    const t = document.createElement('img'); t.src = src;
-    if(i===currentGalleryIndex) t.classList.add('active');
-    t.addEventListener('click', ()=>{ currentGalleryIndex = i; galleryImage.src = currentGallery[i]; updateActive(); });
-    galleryThumbs.appendChild(t);
-  });
-}
-function updateActive(){ const imgs = galleryThumbs.querySelectorAll('img'); imgs.forEach((im,i)=>im.classList.toggle('active', i===currentGalleryIndex)); }
-closeGallery.addEventListener('click', closeGalleryFn);
-function closeGalleryFn(){ galleryModal.classList.remove('show'); galleryModal.setAttribute('aria-hidden','true'); galleryImage.src=''; galleryThumbs.innerHTML=''; document.body.style.overflow=''; }
-
-/* Cart functionality (localStorage) */
-let CART = JSON.parse(localStorage.getItem('movitech_cart') || '[]');
-const cartDrawer = document.getElementById('cartDrawer');
-const cartItemsEl = document.getElementById('cartItems');
-const cartCountEl = document.getElementById('cartCount');
-const cartSubtotalEl = document.getElementById('cartSubtotal');
-
-function saveCart(){ localStorage.setItem('movitech_cart', JSON.stringify(CART)); renderCart(); }
-function addToCart(id){
-  const product = PRODUCTS.find(p=>p.id===id);
-  if(!product) return;
-  const existing = CART.find(i=>i.id===id);
-  if(existing) existing.qty++;
-  else CART.push({ id:product.id, title:product.title, price:product.price, img:(product.images && product.images[0]) || '', qty:1 });
-  saveCart();
-  openCart();
-}
-function buyNow(id){
-  const product = PRODUCTS.find(p=>p.id===id);
-  if(!product) return;
-  CART = [{ id:product.id, title:product.title, price:product.price, img:(product.images && product.images[0]) || '', qty:1 }]; // single item
-  saveCart();
-  openCart();
-}
-
-function renderCart(){
-  cartItemsEl.innerHTML = '';
-  if(CART.length === 0){
-    cartItemsEl.innerHTML = '<div class="small-muted">Tu carrito está vacío</div>';
-    cartCountEl.textContent = 0;
-    cartSubtotalEl.textContent = fmtEUR(0);
-    return;
-  }
-  CART.forEach(item=>{
-    const div = document.createElement('div'); div.className='cart-item';
-    div.innerHTML = `
-      <img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.title)}" />
-      <div style="flex:1">
-        <div style="font-weight:700">${escapeHtml(item.title)}</div>
-        <div class="small-muted">${fmtEUR(item.price)}</div>
-        <div class="qty" style="margin-top:6px">
-          <button class="btn btn-small" data-action="dec" data-id="${item.id}">-</button>
-          <div style="min-width:28px;text-align:center">${item.qty}</div>
-          <button class="btn btn-small" data-action="inc" data-id="${item.id}">+</button>
-          <button class="btn btn-small" data-action="rem" data-id="${item.id}" style="margin-left:8px">Eliminar</button>
-        </div>
-      </div>
-    `;
-    cartItemsEl.appendChild(div);
-  });
-  cartCountEl.textContent = CART.reduce((s,i)=>s+i.qty,0);
-  cartSubtotalEl.textContent = fmtEUR(CART.reduce((s,i)=>s + i.qty * i.price, 0));
-  // attach cart item events
-  cartItemsEl.querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const id = btn.dataset.id;
-      const action = btn.dataset.action;
-      if(action === 'inc'){ changeQty(id,1); }
-      if(action === 'dec'){ changeQty(id,-1); }
-      if(action === 'rem'){ removeItem(id); }
-    });
-  });
-}
-
-function changeQty(id, delta){
-  const it = CART.find(i=>i.id===id); if(!it) return;
-  it.qty += delta; if(it.qty < 1) it.qty = 1;
-  saveCart();
-}
-function removeItem(id){ CART = CART.filter(i=>i.id!==id); saveCart(); }
-
-function openCart(){ cartDrawer.classList.add('open'); cartDrawer.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; renderCart(); }
-function closeCart(){ cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
-
-document.getElementById('openCartBtn').addEventListener('click', ()=>{ openCart(); });
-document.getElementById('closeCartDrawer').addEventListener('click', ()=>{ closeCart(); });
-document.getElementById('clearCartBtn').addEventListener('click', ()=>{ CART = []; saveCart(); });
-document.getElementById('checkoutBtn').addEventListener('click', ()=> {
-  if(CART.length === 0) return alert('El carrito está vacío');
-  // Placeholder checkout flow
-  alert('Simulación de checkout. Implementa integración de pagos para procesar pedidos.');
-  CART = [];
-  saveCart();
-  closeCart();
-});
-
-/* restore cart on load */
-renderCart();
-
-/* Search and filters events */
-searchInput.addEventListener('input', ()=> applyFilters());
-priceFilter.addEventListener('change', ()=> applyFilters());
-sortBy.addEventListener('change', ()=> applyFilters());
-
-/* Close modals on outside click */
-[galleryModal, cartDrawer].forEach(modal => {
-  modal.addEventListener('click', (e)=>{ if(e.target === modal){ modal.classList.remove('show'); closeCart(); }});
-});
-
-/* Footer year */
-document.getElementById('yearFooter').textContent = new Date().getFullYear();
-
-/* Keyboard gallery navigation */
-window.addEventListener('keydown', (e)=>{
-  if(galleryModal.classList.contains('show')){
-    if(e.key === 'ArrowRight'){ currentGalleryIndex = (currentGalleryIndex+1) % currentGallery.length; galleryImage.src = currentGallery[currentGalleryIndex]; updateActive(); }
-    if(e.key === 'ArrowLeft'){ currentGalleryIndex = (currentGalleryIndex-1+currentGallery.length) % currentGallery.length; galleryImage.src = currentGallery[currentGalleryIndex]; updateActive(); }
-    if(e.key === 'Escape'){ closeGalleryFn(); }
-  }
-});
-</script>
-<!-- ======== FORMULARIO DE PEDIDO ======== -->
-<section id="checkout-movitech" style="background:#fff;padding:40px 18px;border-top:1px solid #eee">
-  <div style="max-width:800px;margin:0 auto;display:grid;gap:24px">
-
-    <div style="text-align:center">
-      <h2 style="margin:0 0 10px;font-size:1.8rem;color:#111">Finalizar compra</h2>
-      <p style="color:#666;margin:0 0 8px">Completá tus datos para confirmar tu pedido. Envíos gratis a toda España 🇪🇸</p>
-    </div>
-
-    <!-- Formulario de datos -->
-    <form id="checkoutForm" style="display:grid;gap:14px">
-
-      <!-- Estos se llenarán automáticamente al hacer clic en “Comprar” -->
-      <input type="hidden" id="productName" name="productName" value="">
-      <input type="hidden" id="productPrice" name="productPrice" value="">
-
-      <div>
-        <label>Nombre completo</label>
-        <input type="text" id="name" name="name" required />
-      </div>
-
-      <div>
-        <label>Correo electrónico</label>
-        <input type="email" id="email" name="email" required />
-      </div>
-
-      <div>
-        <label>Teléfono</label>
-        <input type="tel" id="phone" name="phone" required />
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-        <div><label>Provincia</label><input type="text" id="province" name="province" required></div>
-        <div><label>Ciudad</label><input type="text" id="city" name="city" required></div>
-        <div><label>Código postal</label><input type="text" id="postal" name="postal" required></div>
-      </div>
-
-      <input type="hidden" id="country" name="country" value="España">
-
-      <div>
-        <label>Mensaje o aclaraciones</label>
-        <textarea id="message" name="message" rows="4"></textarea>
-      </div>
-
-      <button type="submit" id="submitCheckout">Confirmar pedido</button>
-    </form>
-
-    <!-- IBAN e instrucciones -->
-    <div id="paymentInfo" style="display:none;text-align:center;padding:20px;border-radius:10px;background:#fafafa;border:1px solid #eee">
-      <h3>Método de pago</h3>
-      <p>Titular: <strong>Bridge Building</strong></p>
-      <p>IBAN: <strong>IE06 MODR 9903 5507 0916 80</strong></p>
-      <p>Realizá la transferencia y enviá el comprobante al correo:  
-        <strong>movitech.es@gmail.com</strong>
-      </p>
-      <p style="color:#555;font-size:14px">
-        Recordá adjuntar el comprobante y en el asunto escribir tu nombre completo.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-<!-- Popup visual -->
-<div id="toast" style="position:fixed;top:20px;right:-400px;background:#111;color:#fff;padding:14px 22px;border-radius:10px;transition:all .4s ease;z-index:9999"></div>
-
-<!-- ======== EMAILJS ======== -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-(function() {
-  emailjs.init("RjQA65odlqmPgYN6b");
-})();
-
-const SERVICE_ID = "service_9usf1qb";
-const TEMPLATE_ID = "template_o3cha8b";
-const PUBLIC_KEY = "RjQA65odlqmPgYN6b";
-
-const checkoutForm = document.getElementById("checkoutForm");
-const paymentInfo = document.getElementById("paymentInfo");
-const toast = document.getElementById("toast");
-const submitBtn = document.getElementById("submitCheckout");
-
-function showToast(msg, color="#111") {
-  toast.textContent = msg;
-  toast.style.background = color;
-  toast.style.right = "20px";
-  setTimeout(()=>{toast.style.right = "-400px"},4000);
-}
-
-// Paso 1: confirmar pedido
-checkoutForm.addEventListener("submit", e => {
-  e.preventDefault();
-  submitBtn.disabled = true;
-  showToast("Enviando pedido...", "#444");
-
-  const templateParams = {
-    name: checkoutForm.name.value,
-    email: checkoutForm.email.value,
-    phone: checkoutForm.phone.value,
-    province: checkoutForm.province.value,
-    city: checkoutForm.city.value,
-    postal: checkoutForm.postal.value,
-    country: checkoutForm.country.value,
-    message: checkoutForm.message.value,
-    product: checkoutForm.productName.value || "(Producto no especificado)",
-    price: checkoutForm.productPrice.value || "(Sin precio)"
-  };
-
-  emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
-    .then(() => {
-      showToast("✅ Pedido enviado correctamente", "#16a34a");
-      checkoutForm.style.display = "none";
-      paymentInfo.style.display = "block";
-      submitBtn.disabled = false;
-    })
-    .catch(() => {
-      showToast("❌ Error al enviar pedido", "#dc2626");
-      submitBtn.disabled = false;
-    });
-});
-</script>
-
-  <!-- ======== FIN formulario ======== -->
-
+  </script>
 </body>
 </html>
-
-
-
-
-
