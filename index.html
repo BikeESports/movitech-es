@@ -3,19 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MovitechES</title>
+<title>MovitechES — Tienda de móviles (España)</title>
 <meta name="description" content="MovitechES — Tienda online de móviles y accesorios. Envío gratis a España. Precios en €." />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff;
-  --page-bg:#f6f7f9;
-  --text:#111;
-  --muted:#666;
-  --accent:#e60000;
-  --black:#000000;
-  --card-border:#e9e9e9;
-  --max-width:1200px;
+  --bg:#ffffff; --page-bg:#f6f7f9; --text:#111; --muted:#666;
+  --accent:#e60000; /* rojo comprar */
+  --black:#000000;  /* negro carrito */
+  --card-border:#e9e9e9; --max-width:1200px;
   font-family:'Poppins',sans-serif;
 }
 *{box-sizing:border-box}
@@ -101,39 +97,508 @@ footer{text-align:center;color:var(--muted);padding:28px 8px;margin-top:18px}
 <body>
 
 <header>
-<div class="header-inner">
-  <div class="logo" aria-hidden="false">
-    <img src="logo-movitech-es.png" alt="MovitechES logo" id="siteLogo" onerror="this.style.display='none'; this.parentNode.textContent='MovitechES'">
+  <div class="header-inner">
+    <div class="logo" aria-hidden="false">
+      <img src="logo-movitech-es.png" alt="MovitechES logo" id="siteLogo" onerror="this.style.display='none'; this.parentNode.textContent='MovitechES'">
+    </div>
+    <div class="search">
+      <input id="searchInput" placeholder="Buscar móviles, marcas o modelos (ej. iPhone, Samsung)" />
+    </div>
+    <div class="header-actions">
+      <div style="font-weight:700;color:var(--muted)">Precios en € • Envío gratis</div>
+      <button id="openCartBtn" title="Carrito" style="background:transparent;border:1px solid #f0f0f0;padding:8px 10px;border-radius:8px;cursor:pointer">
+        🛒 <span id="cartCount">0</span>
+      </button>
+    </div>
   </div>
-  <div class="search">
-    <input id="searchInput" placeholder="Buscar móviles, marcas o modelos (ej. iPhone, Samsung)" />
-  </div>
-  <div class="header-actions">
-    <div style="font-weight:700;color:var(--muted)">Precios en € • Envío gratis</div>
-    <button id="openCartBtn" title="Carrito" style="background:transparent;border:1px solid #f0f0f0;padding:8px 10px;border-radius:8px;cursor:pointer"> 🛒 <span id="cartCount">0</span> </button>
-  </div>
-</div>
 
-<nav class="cat-nav" aria-label="Categorías">
-  <button data-cat="all" class="active">Todos</button>
-  <button data-cat="móviles">Móviles</button>
-  <button data-cat="cargadores">Cargadores</button>
-  <button data-cat="smartwatchs">Smartwatchs</button>
-  <button data-cat="auriculares">Auriculares</button>
-</nav>
+  <nav class="cat-nav" aria-label="Categorías">
+    <button data-cat="all" class="active">Todos</button>
+    <button data-cat="móviles">Móviles</button>
+    <button data-cat="cargadores">Cargadores</button>
+    <button data-cat="smartwatchs">Smartwatchs</button>
+    <button data-cat="auriculares">Auriculares</button>
+  </nav>
 </header>
 
 <main class="main">
-<section id="catalog" class="grid" aria-live="polite"></section>
+  <section id="catalog" class="grid" aria-live="polite"></section>
 </main>
 
 <footer>© <span id="yearFooter"></span> MovitechES — Todos los derechos reservados.</footer>
 
-<!-- Aquí iría todo el JS original de productos, carrito, modales, etc., tal como en tu primer mensaje -->
+<!-- Gallery modal (view larger) -->
+<div id="galleryModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong id="galleryTitle" class="modal-title">Galería</strong>
+      <button class="close-x" id="closeGallery">✕</button>
+    </div>
+    <img id="galleryImage" src="" alt="Imagen del producto" style="width:100%;height:auto;max-height:70vh;object-fit:contain;border-radius:8px;display:block;margin:0 auto" />
+    <div class="thumbs-row" id="galleryThumbs"></div>
+  </div>
+</div>
 
+<!-- Buy modal -->
+<div id="buyModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong id="buyTitle" class="modal-title">Finalizar compra</strong>
+      <button class="close-x" id="closeBuy">✕</button>
+    </div>
+
+    <form id="buyForm" enctype="multipart/form-data">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px">
+          <div style="margin-bottom:8px" class="small">Producto</div>
+          <div id="buyProductName" style="font-weight:700;margin-bottom:12px"></div>
+
+          <div style="margin-bottom:8px" class="small">Precio</div>
+          <div id="buyProductPrice" style="font-weight:800;color:var(--accent);margin-bottom:12px"></div>
+
+          <div style="margin-bottom:8px" class="small">Método de pago</div>
+          <div class="iban-box">Titular: <strong>Bridge Building</strong><br>IBAN: <strong>IE06 MODR 9903 5507 0916 80</strong></div>
+
+          <div style="margin-top:12px" class="small">Adjuntá comprobante (imagen o PDF)</div>
+          <input type="file" id="receiptFile" name="receipt" accept="image/*,.pdf" required style="margin-top:8px">
+        </div>
+
+        <div style="flex:1;min-width:240px">
+          <label for="bName">Nombre completo</label>
+          <input id="bName" name="name" required placeholder="Ej. Juan Pérez">
+
+          <label for="bEmail" style="margin-top:8px">Email</label>
+          <input id="bEmail" name="email" type="email" required placeholder="ejemplo@gmail.com">
+
+          <label for="bPhone" style="margin-top:8px">Teléfono</label>
+          <input id="bPhone" name="phone" required placeholder="+34 6...">
+
+          <label for="bProvince" style="margin-top:8px">Provincia</label>
+          <input id="bProvince" name="province" required placeholder="Madrid">
+
+          <label for="bCity" style="margin-top:8px">Ciudad</label>
+          <input id="bCity" name="city" required placeholder="Madrid">
+
+          <label for="bPostal" style="margin-top:8px">Código postal</label>
+          <input id="bPostal" name="postal" required placeholder="28001">
+
+          <input type="hidden" id="bCountry" name="country" value="España">
+          <input type="hidden" id="bTimestamp" name="timestamp" value="">
+          <input type="hidden" id="bProductId" name="productId" value="">
+        </div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="btn" id="cancelBuy" style="background:#f5f5f5;border:1px solid #eee;padding:10px 12px;border-radius:8px">Cancelar</button>
+        <button type="submit" id="submitBuy" class="btn btn-buy">Enviar pedido y comprobante</button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<!-- Cart drawer -->
+<aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
+  <div class="cart-header">
+    <div style="font-weight:800">Tu carrito</div>
+    <button class="close-x" id="closeCartDrawer">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="small-muted">Tu carrito está vacío</div>
+  </div>
+  <div class="cart-footer">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <div class="small-muted">Subtotal</div>
+      <div style="font-weight:800" id="cartSubtotal">0 €</div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button id="checkoutBtn" class="btn btn-buy" style="flex:1">Finalizar compra</button>
+      <button id="clearCartBtn" class="btn" style="flex:1;border:1px solid #eee;background:#fafafa">Vaciar</button>
+    </div>
+    <div style="margin-top:10px;font-size:13px;color:var(--muted)">Integración de pago no incluida. Prototipo front-end.</div>
+  </div>
+</aside>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;top:20px;right:-420px;background:#111;color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.18);transition:all .36s ease;z-index:6000"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-// Tu script original completo como lo enviaste al principio (PRODUCTS, renderCatalog, modales, carrito, EmailJS, etc.)
-</script>
+/* =========================
+   Productos (tus URLs enviadas)
+   ========================= */
+const PRODUCTS = [
+  { id:'poco-x7', category:'móviles', brand:'Xiaomi', title:'Xiaomi POCO X7 Pro 5G 256GB 8GB RAM', price:380, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S51ed01ad95ba4403ac7c8630a0e9c36f0.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S802e3a3b66b644bba4cacb13aacec2400.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'redmi-14-proplus', category:'móviles', brand:'Xiaomi', title:'Xiaomi Redmi Note 14 Pro Plus 5G 256GB 8GB RAM', price:400, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/E8c5a2780e539459f85608fe732361ab2J.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E8ae281165f38412e9f66f67dd69010b4U.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ea8b6a461d9494219bcde3c448ea6ef9eO.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E1d7715d65b6346d6a969f6db32627550I.png_220x220.png_.avif'
+  ]},
+  { id:'redmi-14', category:'móviles', brand:'Xiaomi', title:'Xiaomi Redmi Note 14 256GB 8GB', price:260, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ebd27b1ae56b84fd0afa64cd4be4959e1i.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E82c85dc548574d768f95ef65360753e9W.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E56c215aa001d4512b465c2c4c00bf92fZ.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E21cd69747a2e45619b9ca5f663807780c.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E8c4136c46c904c848d445ab219921126I.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'galaxy-a16', category:'móviles', brand:'Samsung', title:'Samsung Galaxy A16 4G 128GB 8GB RAM', price:260, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/A5d55fb0d809a4e60bf247d99f5d1278bI.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ec2cb8d5f86aa464abd4099db9f7f926fM.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Eca38dfd7bd1843f89b24249ea3d95e71e.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E149f6104c8c846c8868c40e28d48d58ci.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Edf38b861af79471a8ad5953736f6cd6cA.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E2de207c40c094b27b0250d6d21ab38c6P.png_220x220.png_.avif'
+  ]},
+  { id:'galaxy-a55', category:'móviles', brand:'Samsung', title:'Samsung Galaxy A55 5G 128GB 8GB RAM', price:585, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/A2639587b3a9b49d191673527fd5a3e01e.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Aa7a117c95dce4062bc18491d54f1d507h.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ad92572ad74c143e88f3520f9ac9c57baj.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ae334408ed58743f999675382c6a1a16cJ.png_220x220.png_.avif'
+  ]},
+  { id:'galaxy-s25', category:'móviles', brand:'Samsung', title:'Samsung Galaxy S25 256GB 12GB RAM', price:1150, images:[
+    'https://http2.mlstatic.com/D_NQ_NP_2X_837854-MLA93499120927_092025-F.webp',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S60cf8faa4b8e4d98819d8de38965c0ef9.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Se2a162d776c44abbb6082bbb73397311l.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Sb2bddd349f0b448ca498f00345a18d14i.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S35bd184bea14453081fb8f331befb3b7P.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'galaxy-a56', category:'móviles', brand:'Samsung', title:'Samsung Galaxy A56 5G 128GB 8GB RAM', price:390, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ec35f0b27537140688696c969cddeb123U.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Eceb3570c51f04a45aeed7e35dfb7d0e3D.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'motorola-razr50', category:'móviles', brand:'Motorola', title:'Motorola Moto Razr 50 Ultra 5G 512GB 12GB RAM', price:850, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S0e9d3681551a406fa3242af6fa7fa6a1g.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Sbb2a8db03a8b45b5918478ca129d54c0i.png_220x220.png_.avif'
+  ]},
+  { id:'iphone-15-pro', category:'móviles', brand:'Apple', title:'iPhone 15 Pro 256GB 8GB RAM', price:1100, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S40f93b47d7aa420a89cd9c9433dd2a00j.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S57b1525a768f44578809b93bcffd5060b.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'iphone-16-pro-max', category:'móviles', brand:'Apple', title:'iPhone 16 Pro Max 256GB 8GB RAM', price:1700, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/Ec810889b26b0435987e018e3c3d829e6c.jpg_.webp',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E4b6363bf0ee1492fb5f8014beb7f0eeb8.jpg_.webp',
+    'https://ae-pic-a1.aliexpress-media.com/kf/E2cf5a4e659364ec0bba19c8aa4744f3fC.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'iphone-14-refurb', category:'móviles', brand:'Apple', title:'iPhone 14 Reacondicionado 256GB 8GB RAM', price:680, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/Sf9648566a5b149c08c00a9e946108362B.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'iphone-14-pro', category:'móviles', brand:'Apple', title:'iPhone 14 Pro 256GB 6GB RAM', price:900, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S3126c0a24d2e4acb89a8bce298f907e2E.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S7804e0b998074b93aef97ed3daa93cd5u.png_220x220.png_.avif'
+  ]},
+  /* Cargadores */
+  { id:'poco-x7-charger', category:'cargadores', brand:'Xiaomi', title:'Xiaomi Poco X7 Pro cargador 90W Turbo + Cable 2M', price:20, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S22e8714805d446348603d58ad837c792R.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S99b0ce63f5ae4181a94cd3a54db5e39aP.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Sfb6683b966fe41e4b733cc975f63ba34r.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'pd-20w', category:'cargadores', brand:'Universal', title:'Cargador PD 20W USB-C para iPhone', price:15, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S53cdbe00471d4335977c6b6065e4f6edB.jpg_220x220q75.jpg_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/Sf7e7ee9172d544bd8ee20f0b90efe79aR.jpg_220x220q75.jpg_.avif'
+  ]},
+  { id:'samsung-45w', category:'cargadores', brand:'Samsung', title:'Samsung cargador superrápido 45W (Negro/Blanco)', price:15, images:[
+    'https://ae-pic-a1.aliexpress-media.com/kf/S234cd80be2d847c0a328b6d0fb8b3cf97.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S561eeddaa31a46eea9b9b5a8947f08c4M.png_220x220.png_.avif',
+    'https://ae-pic-a1.aliexpress-media.com/kf/S789f176aa49742a48eb76510cbefcadaU.jpg_220x220q75.jpg_.avif'
+  ]}
+];
 
+/* =========================
+   Utilities & render
+   ========================= */
+function fmtEUR(n){ return new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'}).format(n); }
+const catalogEl = document.getElementById('catalog');
+const catButtons = document.querySelectorAll('.cat-nav button');
+let activeCategory = 'all';
+
+function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderCatalog(){
+  catalogEl.innerHTML = '';
+  PRODUCTS.filter(p => activeCategory==='all' || p.category===activeCategory)
+    .forEach((item, idx) => {
+      const card = document.createElement('article'); card.className='card';
+      card.dataset.imgs = JSON.stringify(item.images || []);
+      card.dataset.idx = idx;
+      card.innerHTML = `
+        <div class="thumb-wrap"><img class="thumb" alt="${escapeHtml(item.title)}" data-idx="${idx}"></div>
+        <div class="meta">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+            <div>
+              <div class="title">${escapeHtml(item.title)}</div>
+              <div class="brand">${escapeHtml(item.brand)}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="price">${fmtEUR(item.price)}</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-buy" data-action="buy" data-idx="${idx}">Comprar</button>
+            <button class="btn btn-cart" data-action="add" data-idx="${idx}">Agregar al carrito</button>
+          </div>
+        </div>
+        <div class="thumbs-row" aria-hidden="true"></div>
+      `;
+      catalogEl.appendChild(card);
+    });
+  populateImagesAndThumbs();
+  attachCardEvents();
+}
+renderCatalog();
+
+/* category nav */
+catButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    catButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    renderCatalog();
+  });
+});
+
+/* populate images & thumbs */
+function populateImagesAndThumbs(){
+  document.querySelectorAll('.card').forEach(card=>{
+    try{
+      const imgs = JSON.parse(card.dataset.imgs || '[]');
+      const main = card.querySelector('img.thumb');
+      if(imgs.length) main.src = imgs[0];
+      else main.src = '';
+      const thumbsRow = card.querySelector('.thumbs-row');
+      thumbsRow.innerHTML = '';
+      imgs.forEach((src,i)=>{
+        const t = document.createElement('img'); t.src = src;
+        if(i===0) t.classList.add('active');
+        t.addEventListener('click', ()=> {
+          main.src = src;
+          thumbsRow.querySelectorAll('img').forEach(im=>im.classList.toggle('active', im===t));
+        });
+        thumbsRow.appendChild(t);
+      });
+      // main image click opens gallery modal
+      main.addEventListener('click', ()=> openGallery(card.querySelector('.title').textContent, imgs));
+    }catch(e){}
+  });
+}
+
+/* attach events to actions */
+function attachCardEvents(){
+  document.querySelectorAll('.card .btn').forEach(btn=>{
+    const action = btn.dataset.action; const idx = Number(btn.dataset.idx);
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const product = PRODUCTS[idx];
+      if(action === 'add'){ addToCart(product); }
+      if(action === 'buy'){ openBuyModal(product); }
+    });
+  });
+}
+
+/* ===== Gallery modal ===== */
+const galleryModal = document.getElementById('galleryModal');
+const galleryImage = document.getElementById('galleryImage');
+const galleryThumbs = document.getElementById('galleryThumbs');
+const galleryTitle = document.getElementById('galleryTitle');
+const closeGallery = document.getElementById('closeGallery');
+
+function openGallery(title, images){
+  if(!images || !images.length) return;
+  galleryTitle.textContent = title;
+  galleryImage.src = images[0];
+  galleryThumbs.innerHTML = '';
+  images.forEach((src,i)=>{
+    const t = document.createElement('img'); t.src = src;
+    if(i===0) t.classList.add('active');
+    t.addEventListener('click', ()=> { galleryImage.src = src; galleryThumbs.querySelectorAll('img').forEach(im=>im.classList.toggle('active', im===t)); });
+    galleryThumbs.appendChild(t);
+  });
+  galleryModal.classList.add('show'); galleryModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+}
+closeGallery.addEventListener('click', closeGalleryFn);
+function closeGalleryFn(){ galleryModal.classList.remove('show'); galleryModal.setAttribute('aria-hidden','true'); galleryImage.src=''; galleryThumbs.innerHTML=''; document.body.style.overflow=''; }
+galleryModal.addEventListener('click', (e)=> { if(e.target === galleryModal) closeGalleryFn(); });
+
+/* ===== Cart (localStorage) ===== */
+let CART = JSON.parse(localStorage.getItem('movitech_cart') || '[]');
+const cartDrawer = document.getElementById('cartDrawer');
+const cartItemsEl = document.getElementById('cartItems');
+const cartCountEl = document.getElementById('cartCount');
+const cartSubtotalEl = document.getElementById('cartSubtotal');
+
+function saveCart(){ localStorage.setItem('movitech_cart', JSON.stringify(CART)); renderCart(); }
+function addToCart(product){
+  const existing = CART.find(i=>i.id===product.id);
+  if(existing) existing.qty++;
+  else CART.push({ id:product.id, title:product.title, price:product.price, img:(product.images&&product.images[0])||'', qty:1 });
+  saveCart();
+  showToast('Añadido al carrito: ' + product.title);
+}
+function renderCart(){
+  cartItemsEl.innerHTML = '';
+  if(CART.length === 0){ cartItemsEl.innerHTML = '<div class="small-muted">Tu carrito está vacío</div>'; cartCountEl.textContent = 0; cartSubtotalEl.textContent = fmtEUR(0); return; }
+  CART.forEach(item=>{
+    const div = document.createElement('div'); div.className='cart-item';
+    div.innerHTML = `
+      <img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.title)}" />
+      <div style="flex:1">
+        <div style="font-weight:700">${escapeHtml(item.title)}</div>
+        <div class="small-muted">${fmtEUR(item.price)}</div>
+        <div class="qty" style="margin-top:6px">
+          <button class="btn btn-small" data-action="dec" data-id="${item.id}">-</button>
+          <div style="min-width:28px;text-align:center">${item.qty}</div>
+          <button class="btn btn-small" data-action="inc" data-id="${item.id}">+</button>
+          <button class="btn btn-small" data-action="rem" data-id="${item.id}" style="margin-left:8px">Eliminar</button>
+        </div>
+      </div>
+    `;
+    cartItemsEl.appendChild(div);
+  });
+  cartCountEl.textContent = CART.reduce((s,i)=>s+i.qty,0);
+  cartSubtotalEl.textContent = fmtEUR(CART.reduce((s,i)=>s + i.qty * i.price, 0));
+  // attach cart item events
+  cartItemsEl.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.id; const action = btn.dataset.action;
+      if(action === 'inc'){ changeQty(id,1); }
+      if(action === 'dec'){ changeQty(id,-1); }
+      if(action === 'rem'){ removeItem(id); }
+    });
+  });
+}
+function changeQty(id,delta){ const it = CART.find(i=>i.id===id); if(!it) return; it.qty += delta; if(it.qty<1) it.qty=1; saveCart(); }
+function removeItem(id){ CART = CART.filter(i=>i.id!==id); saveCart(); }
+function openCart(){ cartDrawer.classList.add('open'); cartDrawer.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; renderCart(); }
+function closeCart(){ cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+document.getElementById('openCartBtn').addEventListener('click', ()=> openCart());
+document.getElementById('closeCartDrawer').addEventListener('click', ()=> closeCart());
+document.getElementById('clearCartBtn').addEventListener('click', ()=> { CART = []; saveCart(); });
+document.getElementById('checkoutBtn').addEventListener('click', ()=> {
+  if(CART.length === 0) return alert('El carrito está vacío');
+  // move single or multiple — but for simplicity open buy modal prefilled with first item
+  const first = PRODUCTS.find(p=>p.id===CART[0].id);
+  if(first) openBuyModal(first);
+  closeCart();
+});
+renderCart();
+
+/* ===== Buy modal & EmailJS ===== */
+const buyModal = document.getElementById('buyModal');
+const buyForm = document.getElementById('buyForm');
+const buyProductName = document.getElementById('buyProductName');
+const buyProductPrice = document.getElementById('buyProductPrice');
+const closeBuy = document.getElementById('closeBuy');
+const cancelBuy = document.getElementById('cancelBuy');
+const submitBuy = document.getElementById('submitBuy');
+
+let currentProduct = null;
+
+/* EmailJS init */
+emailjs.init('RjQA65odlqmPgYN6b');
+const SERVICE_ID = 'service_9usf1qb';
+const TEMPLATE_ID = 'template_o3cha8b';
+const PUBLIC_KEY = 'RjQA65odlqmPgYN6b';
+
+function openBuyModal(product){
+  currentProduct = product;
+  buyProductName.textContent = product.title;
+  buyProductPrice.textContent = fmtEUR(product.price);
+  document.getElementById('bTimestamp').value = (new Date()).toLocaleString('es-ES');
+  document.getElementById('bProductId').value = product.id;
+  buyForm.reset();
+  buyModal.classList.add('show'); buyModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+}
+closeBuy.addEventListener('click', ()=> { buyModal.classList.remove('show'); document.body.style.overflow=''; });
+cancelBuy.addEventListener('click', ()=> { buyModal.classList.remove('show'); document.body.style.overflow=''; });
+buyModal.addEventListener('click', (e)=> { if(e.target === buyModal){ buyModal.classList.remove('show'); document.body.style.overflow=''; } });
+
+buyForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  if(!currentProduct){ alert('Producto no seleccionado.'); return; }
+
+  // gather form
+  const name = document.getElementById('bName').value.trim();
+  const email = document.getElementById('bEmail').value.trim();
+  const phone = document.getElementById('bPhone').value.trim();
+  const province = document.getElementById('bProvince').value.trim();
+  const city = document.getElementById('bCity').value.trim();
+  const postal = document.getElementById('bPostal').value.trim();
+  const country = document.getElementById('bCountry').value.trim();
+  const timestamp = document.getElementById('bTimestamp').value;
+  const productId = document.getElementById('bProductId').value;
+  const fileInput = document.getElementById('receiptFile');
+
+  if(!name || !email || !phone || !province || !city || !postal || !fileInput.files.length){
+    alert('Por favor completá todos los campos y adjuntá el comprobante.');
+    return;
+  }
+
+  submitBuy.disabled = true;
+  submitBuy.textContent = 'Enviando...';
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = function(){
+    const base64 = reader.result;
+
+    const templateParams = {
+      to_email: 'movitechesp@gmail.com',
+      name,
+      email,
+      phone,
+      province,
+      city,
+      postal,
+      country,
+      timestamp,
+      product: currentProduct.title,
+      price: fmtEUR(currentProduct.price),
+      iban: 'IE06 MODR 9903 5507 0916 80',
+      titular: 'Bridge Building',
+      receipt_base64: base64
+    };
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+      .then(() => {
+        showToast('✅ Pedido enviado correctamente. Te contactaremos en breve.');
+        buyModal.classList.remove('show');
+        buyForm.reset();
+      })
+      .catch((err) => {
+        console.error('EmailJS error', err);
+        showToast('❌ Error al enviar. Intentá nuevamente.');
+      })
+      .finally(()=> {
+        submitBuy.disabled = false;
+        submitBuy.textContent = 'Enviar pedido y comprobante';
+      });
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ===== Toast utility ===== */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.right = '20px';
+  t.style.opacity = '1';
+  t.style.display = 'block';
+  setTimeout(()=> { t.style.right = '-420px'; }, 3600);
+}
+
+/* Footer year */
+document.getElementById('yearFooter').textContent = new Date().getFullYear();
+
+/* Close modals on Escape */
+window.addEventListener('keydown', (e)=> {
+  if(e.key === 'Escape'){
+    if(document.querySelector('.modal.show')) document.querySelectorAll('.modal.show').forEach(m=> m.classList.remove('show'));
+    closeCart();
+  }
+});
+</script>
 </body>
 </html>
