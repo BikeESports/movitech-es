@@ -152,3 +152,57 @@ const PRODUCTS = [
 
 /* ========================= Utilities & render ========================= */
 function fmtEUR(n){ return new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'}).format(n); }
+function escapeHtml(text){return text.replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];})}
+
+/* ========================= Render Catalog ========================= */
+const catalogEl = document.getElementById('catalog');
+let activeCategory='all';
+
+function renderCatalog(){
+  catalogEl.innerHTML='';
+  let productsToShow = PRODUCTS.filter(p=>activeCategory==='all'||p.category===activeCategory);
+
+  if(productsToShow.length===0){
+    catalogEl.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px 0;font-weight:700;">Próximamente en MovitechES 🚀</div>`;
+    return;
+  }
+
+  const sortOrder = document.getElementById('sortPrice').value;
+  if(sortOrder==='asc'){ productsToShow.sort((a,b)=>a.price-b.price); }
+  else if(sortOrder==='desc'){ productsToShow.sort((a,b)=>b.price-a.price); }
+
+  productsToShow.forEach((item,idx)=>{
+    const card=document.createElement('article');
+    card.className='card';
+    card.innerHTML=`<div class="thumb-wrap"><img class="thumb" alt="${escapeHtml(item.title)}"></div>
+    <div class="meta">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div><div class="title">${escapeHtml(item.title)}</div><div class="brand">${escapeHtml(item.brand)}</div></div>
+        <div style="text-align:right"><div class="price">${fmtEUR(item.price)}</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-buy">Comprar</button>
+        <button class="btn btn-cart">Agregar al carrito</button>
+      </div>
+    </div>`;
+    catalogEl.appendChild(card);
+  });
+}
+
+/* ========================= Eventos ========================= */
+document.getElementById('sortPrice').addEventListener('change',renderCatalog);
+document.querySelectorAll('.cat-nav button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory=btn.dataset.cat;
+    renderCatalog();
+  });
+});
+
+/* ========================= Inicial ========================= */
+renderCatalog();
+document.getElementById('yearFooter').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
