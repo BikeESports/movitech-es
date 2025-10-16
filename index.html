@@ -7,7 +7,6 @@
 <meta name="description" content="MovitechES — Tienda online de móviles y accesorios. Envío gratis a España. Precios en €." />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ==== tus estilos originales ==== */
 :root{
   --bg:#ffffff; --page-bg:#f6f7f9; --text:#111; --muted:#666;
   --accent:#e60000;
@@ -49,7 +48,6 @@ header{position:sticky;top:0;background:#fff;z-index:1200;border-bottom:1px soli
   cursor:pointer;
 }
 
-/* resto igual */
 .card{background:#fff;border:1px solid var(--card-border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease}
 .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.06)}
 .thumb-wrap{padding:12px;background:#fbfcfd;display:flex;align-items:center;justify-content:center}
@@ -68,6 +66,16 @@ header{position:sticky;top:0;background:#fff;z-index:1200;border-bottom:1px soli
 footer{text-align:center;color:var(--muted);padding:28px 8px;margin-top:18px}
 @media (max-width:900px){
   .thumb{height:160px}
+}
+
+/* cartel de próximamente */
+.proximamente{
+  grid-column:1/-1;
+  text-align:center;
+  font-size:1.2rem;
+  color:var(--muted);
+  padding:60px 0;
+  font-weight:600;
 }
 </style>
 </head>
@@ -98,7 +106,7 @@ footer{text-align:center;color:var(--muted);padding:28px 8px;margin-top:18px}
   </nav>
 </header>
 
-<!-- 🔽 NUEVA BARRA DE ORDEN 🔽 -->
+<!-- barra de orden -->
 <div class="sort-bar">
   <select id="sortSelect">
     <option value="none">Ordenar por</option>
@@ -106,7 +114,6 @@ footer{text-align:center;color:var(--muted);padding:28px 8px;margin-top:18px}
     <option value="desc">Precio: de mayor a menor</option>
   </select>
 </div>
-<!-- 🔼 FIN DE NUEVA BARRA 🔼 -->
 
 <main class="main">
   <section id="catalog" class="grid"></section>
@@ -119,7 +126,8 @@ const PRODUCTS = [
   {id:'poco-x7',category:'móviles',brand:'Xiaomi',title:'Xiaomi POCO X7 Pro 5G',price:380,images:['https://ae-pic-a1.aliexpress-media.com/kf/S51ed01ad95ba4403ac7c8630a0e9c36f0.png_220x220.png_.avif']},
   {id:'iphone-16-pro-max',category:'móviles',brand:'Apple',title:'iPhone 16 Pro Max',price:1700,images:['https://ae-pic-a1.aliexpress-media.com/kf/Ec810889b26b0435987e018e3c3d829e6c.jpg_.webp']},
   {id:'galaxy-a16',category:'móviles',brand:'Samsung',title:'Samsung Galaxy A16',price:260,images:['https://ae-pic-a1.aliexpress-media.com/kf/A5d55fb0d809a4e60bf247d99f5d1278bI.png_220x220.png_.avif']},
-  {id:'poco-x7-charger',category:'cargadores',brand:'Xiaomi',title:'Cargador POCO X7',price:20,images:['https://ae-pic-a1.aliexpress-media.com/kf/S22e8714805d446348603d58ad837c792R.jpg_220x220q75.jpg_.avif']}
+  {id:'poco-x7-charger',category:'cargadores',brand:'Xiaomi',title:'Cargador POCO X7',price:20,images:['https://ae-pic-a1.aliexpress-media.com/kf/S22e8714805d446348603d58ad837c792R.jpg_220x220q75.jpg_.avif']},
+  {id:'samsung-45w',category:'cargadores',brand:'Samsung',title:'Cargador Rápido 45W',price:35,images:['https://ae-pic-a1.aliexpress-media.com/kf/S14f0bb4a4d01487f8a1b82012c168c34u.jpg_220x220q75.jpg_.avif']}
 ];
 
 const catalogEl = document.getElementById('catalog');
@@ -135,11 +143,14 @@ function renderCatalog(){
   catalogEl.innerHTML='';
   let filtered = PRODUCTS.filter(p=>activeCategory==='all'||p.category===activeCategory);
   
-  // 🔽 ORDENAR POR PRECIO 🔽
   if(sortMode==='asc') filtered.sort((a,b)=>a.price-b.price);
   if(sortMode==='desc') filtered.sort((a,b)=>b.price-a.price);
-  // 🔼 FIN ORDEN 🔼
   
+  if(filtered.length===0){
+    catalogEl.innerHTML=`<div class="proximamente">🕒 Próximamente en MovitechES</div>`;
+    return;
+  }
+
   filtered.forEach(item=>{
     const card=document.createElement('article');card.className='card';
     card.innerHTML=`
@@ -172,3 +183,4 @@ renderCatalog();
 </script>
 </body>
 </html>
+
