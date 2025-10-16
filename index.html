@@ -7,10 +7,9 @@
 <meta name="description" content="MovitechES — Tienda online de móviles y accesorios. Envío gratis a España. Precios en €." />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
+:root {
   --bg:#ffffff; --page-bg:#f6f7f9; --text:#111; --muted:#666;
-  --accent:#e60000;
-  --black:#000000;
+  --accent:#e60000; --black:#000000;
   --card-border:#e9e9e9; --max-width:1200px;
   font-family:'Poppins',sans-serif;
 }
@@ -24,6 +23,7 @@ header{position:sticky;top:0;background:#fff;z-index:1200;border-bottom:1px soli
 .search{flex:1}
 .search input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #eee}
 .header-actions{display:flex;gap:12px;align-items:center}
+
 .cat-nav{max-width:var(--max-width);margin:10px auto;padding:0 16px;display:flex;gap:12px;overflow:auto}
 .cat-nav button{background:transparent;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;color:var(--muted)}
 .cat-nav button.active{background:#fff;color:var(--accent);border:1px solid #fdecea;box-shadow:0 6px 18px rgba(0,0,0,0.03)}
@@ -31,7 +31,7 @@ header{position:sticky;top:0;background:#fff;z-index:1200;border-bottom:1px soli
 .main{max-width:var(--max-width);margin:18px auto;padding:0 16px 80px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
 
-/* selector de orden */
+/* barra de orden */
 .sort-bar{
   max-width:var(--max-width);
   margin:10px auto;
@@ -66,16 +66,6 @@ header{position:sticky;top:0;background:#fff;z-index:1200;border-bottom:1px soli
 footer{text-align:center;color:var(--muted);padding:28px 8px;margin-top:18px}
 @media (max-width:900px){
   .thumb{height:160px}
-}
-
-/* cartel de próximamente */
-.proximamente{
-  grid-column:1/-1;
-  text-align:center;
-  font-size:1.2rem;
-  color:var(--muted);
-  padding:60px 0;
-  font-weight:600;
 }
 </style>
 </head>
@@ -142,14 +132,10 @@ function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&a
 function renderCatalog(){
   catalogEl.innerHTML='';
   let filtered = PRODUCTS.filter(p=>activeCategory==='all'||p.category===activeCategory);
-  
+
+  // ordenamiento
   if(sortMode==='asc') filtered.sort((a,b)=>a.price-b.price);
   if(sortMode==='desc') filtered.sort((a,b)=>b.price-a.price);
-  
-  if(filtered.length===0){
-    catalogEl.innerHTML=`<div class="proximamente">🕒 Próximamente en MovitechES</div>`;
-    return;
-  }
 
   filtered.forEach(item=>{
     const card=document.createElement('article');card.className='card';
@@ -183,4 +169,3 @@ renderCatalog();
 </script>
 </body>
 </html>
-
